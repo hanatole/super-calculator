@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .calculator {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 320px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #16a34a;
+        }
+
+        .error {
+            color: #dc2626;
+        }
+    </style>
+</head>
+
+<body>
+<div class="calculator">
+    <h1>Calculator</h1>
+
+    <input id="a" type="number" placeholder="First number">
+    
+    <select id="operator">
+        <option value="+">Addition (+)</option>
+        <option value="-">Subtraction (-)</option>
+        <option value="*">Multiplication (*)</option>
+        <option value="/">Division (/)</option>
+    </select>
+
+    <input id="b" type="number" placeholder="Second number">
+
+    <button onclick="calculate()">Calculate</button>
+
+    <div id="result" class="result"></div>
+</div>
+
+<script>
+async function calculate() {
+    const a = Number(document.getElementById("a").value);
+    const b = Number(document.getElementById("b").value);
+    const operator = document.getElementById("operator").value;
+
+    const resultElement = document.getElementById("result");
+
+    try {
+        const response = await fetch("/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                a,
+                b,
+                operator
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.detail);
+        }
+
+        resultElement.className = "result";
+        resultElement.textContent = `Result: ${data.result}`;
+
+    } catch (error) {
+        resultElement.className = "result error";
+        resultElement.textContent = error.message;
+    }
+}
+</script>
+
+</body>
+</html>

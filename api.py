@@ -1,5 +1,6 @@
 from fastapi import FastAPI,HTTPException
 from pydantic import BaseModel
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
@@ -29,3 +30,5 @@ def healthcheck():
 @app.post("/", response_model=dict)
 def calculate(request: OperationRequest):
     return {"result": _calculate(request.a, request.b, request.operator)}
+
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
