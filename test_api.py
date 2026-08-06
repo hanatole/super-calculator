@@ -1,8 +1,8 @@
+import pytest
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
-from fastapi import HTTPException
 from api import _calculate, app
-import pytest
 
 client = TestClient(app)
 
