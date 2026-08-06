@@ -1,0 +1,16 @@
+[project]
+name = "calculator"
+version = "0.1.0"
+description = "Implement basic arithmetic operations"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi>=0.141.1",
+    "uvicorn>=0.52.1",
+]
+
+[dependency-groups]
+dev = [
+    "httpx2>=2.9.1",
+    "pytest>=9.1.1",
+]
