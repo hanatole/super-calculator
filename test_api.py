@@ -6,33 +6,37 @@ from api import _calculate, app
 
 client = TestClient(app)
 
+
 def test_healthcheck():
     response = client.get("/healthz")
 
     assert response.status_code == 200
     assert response.json() == {"status": "OK"}
 
+
 def test_addition():
-    response = client.post("/",json={"a": 10, "b":8, "operator":"+"})
+    response = client.post("/", json={"a": 10, "b": 8, "operator": "+"})
     assert response.status_code == 200
-    assert response.json() == {"result":18}
+    assert response.json() == {"result": 18}
 
 
 def test_substraction():
-    response = client.post("/",json={"a": 10, "b":8, "operator":"-"})
+    response = client.post("/", json={"a": 10, "b": 8, "operator": "-"})
     assert response.status_code == 200
-    assert response.json() == {"result":2}
+    assert response.json() == {"result": 2}
 
 
 def test_multiplication():
-    response = client.post("/",json={"a": 10, "b":8, "operator":"*"})
+    response = client.post("/", json={"a": 10, "b": 8, "operator": "*"})
     assert response.status_code == 200
-    assert response.json() == {"result":80}
+    assert response.json() == {"result": 80}
+
 
 def test_division():
-    response = client.post("/",json={"a": 10, "b":8, "operator":"/"})
+    response = client.post("/", json={"a": 10, "b": 8, "operator": "/"})
     assert response.status_code == 200
-    assert response.json() == {"result":1.25}
+    assert response.json() == {"result": 1.25}
+
 
 def test_unknown_operator():
     with pytest.raises(HTTPException) as exc:
@@ -41,6 +45,7 @@ def test_unknown_operator():
     assert exc.value.status_code == 400
     assert exc.value.detail == "Unknown operator"
 
+
 def test_division_by_zero():
     with pytest.raises(HTTPException) as exc:
         _calculate(10, 0, "/")
@@ -48,7 +53,8 @@ def test_division_by_zero():
     assert exc.value.status_code == 400
     assert exc.value.detail == "Division by zero"
 
+
 def test_modulus():
-    response = client.post("/",json={"a": 10, "b":3, "operator":"%"})
+    response = client.post("/", json={"a": 10, "b": 3, "operator": "%"})
     assert response.status_code == 200
-    assert response.json() == {"result":1}
+    assert response.json() == {"result": 1}
