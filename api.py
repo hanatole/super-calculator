@@ -21,6 +21,10 @@ def _calculate(a, b, operator):
         if b == 0:
             raise HTTPException(status_code=400, detail="Division by zero")
         return a /b
+    if operator == "%":
+        if b == 0:
+            raise HTTPException(status_code=400, detail="Division by zero")
+        return a % b
     raise HTTPException(status_code=400, detail="Unknown operator")
 
 @app.get("/healthz", response_model=dict)

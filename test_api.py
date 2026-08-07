@@ -36,7 +36,7 @@ def test_division():
 
 def test_unknown_operator():
     with pytest.raises(HTTPException) as exc:
-        _calculate(10, 8, "%")
+        _calculate(10, 8, "x")
 
     assert exc.value.status_code == 400
     assert exc.value.detail == "Unknown operator"
@@ -47,3 +47,8 @@ def test_division_by_zero():
 
     assert exc.value.status_code == 400
     assert exc.value.detail == "Division by zero"
+
+def test_modulus():
+    response = client.post("/",json={"a": 10, "b":3, "operator":"%"})
+    assert response.status_code == 200
+    assert response.json() == {"result":1}
