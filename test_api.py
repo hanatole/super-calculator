@@ -59,6 +59,7 @@ def test_modulus():
     assert response.status_code == 200
     assert response.json() == {"result": 1}
 
+
 def test_floor_division():
     response = client.post("/", json={"a": 11, "b": 3, "operator": "//"})
     assert response.status_code == 200
