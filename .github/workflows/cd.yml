@@ -1,0 +1,97 @@
+name: Continuous Delivery
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to server
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+        run: |
+          printf '%s\n' "$SSH_PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+
+          ssh -i private_key.pem \
+            -o StrictHostKeyChecking=no \
+            "$SERVER_USERNAME@$SERVER_IP" 'bash -se' <<'REMOTE'
+
+          set -e
+
+          sudo mkdir -p /srv/calculator
+          sudo chown -R "$USER:$USER" /srv/calculator
+
+          if [ -d /srv/calculator/.git ]; then
+              cd /srv/calculator
+              git pull --ff-only
+          else
+              git clone https://github.com/hanatole/super-calculator.git /srv/calculator
+              cd /srv/calculator
+          fi
+
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          source "$HOME/.local/bin/env"
+
+          uv sync
+
+          sudo tee /etc/systemd/system/calculator.service > /dev/null <<'EOF'
+          [Unit]
+          Description=FastAPI Calculator
+          After=network.target
+
+          [Service]
+          User=www-data
+          Group=www-data
+          WorkingDirectory=/srv/calculator
+          Environment="PATH=/srv/calculator/.venv/bin"
+          ExecStart=/srv/calculator/.venv/bin/uvicorn api:app --host 127.0.0.1 --port 8000
+          Restart=always
+          RestartSec=3
+
+          [Install]
+          WantedBy=multi-user.target
+          EOF
+
+          sudo systemctl daemon-reload
+          sudo systemctl enable --now calculator
+
+          if ! command -v caddy >/dev/null 2>&1; then
+              sudo apt update
+              sudo apt install -y \
+                debian-keyring \
+                debian-archive-keyring \
+                apt-transport-https \
+
+              curl -1sLf \
+                'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' |
+                sudo gpg --dearmor \
+                -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+
+              curl -1sLf \
+                'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' |
+                sudo tee /etc/apt/sources.list.d/caddy-stable.list > /dev/null
+
+              sudo apt update
+              sudo apt install -y caddy
+          fi
+
+          sudo tee /etc/caddy/Caddyfile > /dev/null <<'EOF'
+          calculator.bitnoises.com {
+              reverse_proxy localhost:8000
+          }
+          EOF
+
+          sudo caddy validate --config /etc/caddy/Caddyfile
+          sudo systemctl enable caddy
+          sudo systemctl restart caddy
+
+          REMOTE
+
+          rm -f private_key.pem
