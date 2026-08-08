@@ -18,6 +18,8 @@ def _calculate(a, b, operator):
         return a - b
     if operator == "*":
         return a * b
+    if operator == "^":
+        return a**b
     if operator == "/":
         if b == 0:
             raise HTTPException(status_code=400, detail="Division by zero")
