@@ -11,4 +11,7 @@ jobs:
     steps:
       - name: login the server
         run: |
-                echo ${{ secrets.SSH_PRIVATE_KEY }} | sshpass ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "cat file.txt"
+            echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+            chmod 600 private_key.pem
+            ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "cat file.txt"
+            rm private_key.pem
