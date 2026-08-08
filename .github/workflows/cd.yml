@@ -1,7 +1,10 @@
 name: Continuous Delivery
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Continuous Integration"]
+    types:
+      - completed
     branches:
       - main
 
@@ -61,6 +64,7 @@ jobs:
 
           sudo systemctl daemon-reload
           sudo systemctl enable --now calculator
+          sudo systemctl restart calculator
 
           if ! command -v caddy >/dev/null 2>&1; then
               sudo apt update
