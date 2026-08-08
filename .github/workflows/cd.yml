@@ -9,5 +9,5 @@ jobs:
   deploy:
     runs-on: ubuntu-26.04
     steps:
-      - name: check SSH
-        run: which ssh
+      - name: login the server
+        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "echo 'Logged in successfully'"
