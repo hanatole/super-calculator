@@ -10,4 +10,5 @@ jobs:
     runs-on: ubuntu-26.04
     steps:
       - name: login the server
-        run: ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "echo 'Logged in successfully'"
+        run: |
+                echo ${{ secrets.SSH_PRIVATE_KEY }} | sshpass ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }} "cat file.txt"
