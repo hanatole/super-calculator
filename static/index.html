@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,7 +19,7 @@
             background: white;
             padding: 30px;
             border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             width: 320px;
             text-align: center;
         }
@@ -27,7 +28,9 @@
             color: #333;
         }
 
-        input, select, button {
+        input,
+        select,
+        button {
             width: 100%;
             padding: 12px;
             margin: 8px 0;
@@ -61,61 +64,64 @@
 </head>
 
 <body>
-<div class="calculator">
-    <h1>Calculator</h1>
+    <div class="calculator">
+        <h1>Calculator</h1>
 
-    <input id="a" type="number" placeholder="First number">
-    
-    <select id="operator">
-        <option value="+">Addition (+)</option>
-        <option value="-">Subtraction (-)</option>
-        <option value="*">Multiplication (*)</option>
-        <option value="/">Division (/)</option>
-    </select>
+        <input id="a" type="number" placeholder="First number">
 
-    <input id="b" type="number" placeholder="Second number">
+        <select id="operator">
+            <option value="+">Addition (+)</option>
+            <option value="-">Subtraction (-)</option>
+            <option value="*">Multiplication (*)</option>
+            <option value="//">Floor Division (//)</option>
+            <option value="%">Modulus (%)
+            <option value="/">Division (/)</option>
+        </select>
 
-    <button onclick="calculate()">Calculate</button>
+        <input id="b" type="number" placeholder="Second number">
 
-    <div id="result" class="result"></div>
-</div>
+        <button onclick="calculate()">Calculate</button>
 
-<script>
-async function calculate() {
-    const a = Number(document.getElementById("a").value);
-    const b = Number(document.getElementById("b").value);
-    const operator = document.getElementById("operator").value;
+        <div id="result" class="result"></div>
+    </div>
 
-    const resultElement = document.getElementById("result");
+    <script>
+        async function calculate() {
+            const a = Number(document.getElementById("a").value);
+            const b = Number(document.getElementById("b").value);
+            const operator = document.getElementById("operator").value;
 
-    try {
-        const response = await fetch("/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                a,
-                b,
-                operator
-            })
-        });
+            const resultElement = document.getElementById("result");
 
-        const data = await response.json();
+            try {
+                const response = await fetch("/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        a,
+                        b,
+                        operator
+                    })
+                });
 
-        if (!response.ok) {
-            throw new Error(data.detail);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail);
+                }
+
+                resultElement.className = "result";
+                resultElement.textContent = `Result: ${data.result}`;
+
+            } catch (error) {
+                resultElement.className = "result error";
+                resultElement.textContent = error.message;
+            }
         }
-
-        resultElement.className = "result";
-        resultElement.textContent = `Result: ${data.result}`;
-
-    } catch (error) {
-        resultElement.className = "result error";
-        resultElement.textContent = error.message;
-    }
-}
-</script>
+    </script>
 
 </body>
+
 </html>
