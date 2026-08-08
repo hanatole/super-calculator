@@ -1,0 +1,13 @@
+name: Continuous Delivery
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-26.04
+    steps:
+      - name: check SSH
+        run: which ssh
